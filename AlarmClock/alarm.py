@@ -15,6 +15,8 @@ mainframe.rowconfigure(0,weight=1)
 
 timer = StringVar()
 
+timer_entry = ttk.Entry(mainframe,width=7,textvariable=timer)
+timer_entry.grid(column=2,row=1,sticky=(W,E))
 ttk.Label(mainframe, textvariable=timer).grid(column=2, row=2, sticky=(W,E))
 ttk.Button(mainframe, text="Set Alarm", command=setAlarm).grid(column=3,row=3,sticky=W)
 
