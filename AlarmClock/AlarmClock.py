@@ -26,11 +26,11 @@ class AlarmClock(Frame):
         self.set_alarm["command"] = self.setAlarm
         self.set_alarm.pack({"side": "bottom"})    
         
-        self.volume_slider = Scale(length=140, label='Volume')
+        self.volume_slider = Scale(length=140, label='Volume', from_=100, to=0)
         self.volume_slider.pack({"side":"right"})
         self.volume_slider.set(self.volume)
 
-        self.sensor_data = Scale(length=140, label='Noise')
+        self.sensor_data = Scale(length=140, label='Noise', from_=100, to=0)
         self.sensor_data.pack({"side":"left"})
 
         self.alarm_sound = Sound('boom.wav')
