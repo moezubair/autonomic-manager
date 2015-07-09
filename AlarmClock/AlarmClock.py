@@ -28,25 +28,40 @@ class AlarmClock(Frame):
         
         self.volume_slider = Scale(length=140, label='Volume')
         self.volume_slider.pack({"side":"right"})
+        self.volume_slider.set(self.volume)
 
         self.sensor_data = Scale(length=140, label='Noise')
         self.sensor_data.pack({"side":"left"})
 
-        self.alarm_sound = Sound('/Users/jorgeconde/Downloads/pygame-1.9.1release/examples/data/boom.wav')
+        self.alarm_sound = Sound('boom.wav')
 
         
     def setAlarm(self):
-        #timer.set(time)
+        self.alarm_set = True
         print (self.alarm.get())
 
     def stopAlarm(self):
+        self.alarm_sound.stopSound()
+        self.alarm_set = False
+        self.alarm_playing = False
         print ("Stop alarm")
 
     def tick(self):
+        self.volume = self.volume_slider.get()
         self.time2 = time.strftime('%H:%M:%S')
+
         if self.time2 != self.time1:
             self.time1 = self.time2
             self.clock.config(text=self.time2)
+
+        if self.alarm.get() == time.strftime('%H:%M') and self.alarm_set and not self.alarm_playing:
+            self.alarm_sound.playSound()
+            self.alarm_playing = True
+
+        if self.volume < 100:
+            self.volume += 1
+            self.volume_slider.set(self.volume)
+            self.alarm_sound.soundVolume(self.volume)
 
         # calls itself every 200 milliseconds
         # to update the time display as needed
@@ -56,10 +71,11 @@ class AlarmClock(Frame):
     def __init__(self, master=None):
         Frame.__init__(self, master)
         self.pack({"side": "bottom"})
-        self.createWidgets()
-
+        self.volume = 50
         self.time1 = ''
         self.alarm_set = False
+        self.alarm_playing = False
+        self.createWidgets()
         self.tick()
         
 
