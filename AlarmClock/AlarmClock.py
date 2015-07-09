@@ -59,9 +59,9 @@ class AlarmClock(Frame):
             self.alarm_playing = True
 
         if self.volume < 100:
-            self.volume += 1
+            self.volume += 1.0
             self.volume_slider.set(self.volume)
-            self.alarm_sound.soundVolume(self.volume)
+            self.alarm_sound.soundVolume(self.volume/100)
 
         # calls itself every 200 milliseconds
         # to update the time display as needed
@@ -71,7 +71,7 @@ class AlarmClock(Frame):
     def __init__(self, master=None):
         Frame.__init__(self, master)
         self.pack({"side": "bottom"})
-        self.volume = 50
+        self.volume = 50.0
         self.time1 = ''
         self.alarm_set = False
         self.alarm_playing = False
