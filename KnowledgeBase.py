@@ -57,7 +57,7 @@ class KnowledgeBase:
         c.execute("SELECT * FROM Tasks WHERE executed=0 ORDER BY date desc")
         return c.fetchall()
     def __init__(self):
-       self.database = 'knowledge.db'
+       self.database = '../knowledge.db'
        self.createTables()
 
 #Knowledge = KnowledgeBase()
