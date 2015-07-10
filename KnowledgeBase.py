@@ -15,6 +15,9 @@ class KnowledgeBase:
         #Create table for Planner to create tasks
         c.execute('''Create TABLE if not exists Tasks
                     (tkey integer primary key, akey integer, date timestamp, volume int)''')
+        #Create table for policy
+        c.execute('''Create TABLE if not exists Policy
+                    (policykey integer primary key, property string, action string, value int)''')
         conn.commit()
         conn.close()
     def insertMonitorData(self,noise, volume, duration):
@@ -52,10 +55,35 @@ class KnowledgeBase:
     ###
     def readTasks(self):
         global database
-        conn = sqllite3.connect(self.database)
+        conn = sqlite3.connect(self.database)
         c=conn.cursor()
         c.execute("SELECT * FROM Tasks WHERE executed=0 ORDER BY date desc")
         return c.fetchall()
+    def createPolicy(self):
+        global database
+
+        conn = sqlite3.connect(self.database)
+        c=conn.cursor()
+        c.execute('INSERT INTO Policy VALUES (NULL,?,?,?)',("Volume","Increase",10))
+        c.execute('INSERT INTO Policy VALUES (NULL,?,?,?)',("Volume","Decrease",10))
+        c.execute('INSERT INTO Policy VALUES (NULL,?,?,?)',("Duration","None",10000))
+
+        conn.commit()
+        conn.close()
+    def readPolicy(self,Policy="all",property="all"):
+        #Read monitor data log, this is used by the analyzer to read the latest monitor data value
+        global database
+        result = ""
+        conn = sqlite3.connect(self.database)
+        c=conn.cursor()
+        if (property=="all"):
+            c.execute("SELECT * FROM Policy ORDER BY policykey asc")
+            result= c.fetchall()
+        else:
+            c.execute('SELECT * FROM Policy WHERE property=? ',property)
+        conn.commit()
+        conn.close()
+        return result
     def __init__(self):
        self.database = '../knowledge.db'
        self.createTables()
