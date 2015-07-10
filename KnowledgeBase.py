@@ -9,12 +9,12 @@ class KnowledgeBase:
         c.execute('''Create TABLE if not exists MonitorDataLog
                     (mkey integer primary key,date timestamp, NoiseLevel int,VolumeLevel, Duration real)''')
         #Create table for Analyzer to store data to
-        c.execute('''Create TABLE if not exists Symptoms
-                    (skey integer primary key, mkey integer, date timestamp, property string, symptom string)''')
+        c.execute('''Create TABLE if not exists AnalyzerDataLog
+                    (akey integer primary key, mkey integer, date timestamp, property string, action string)''')
 
         #Create table for Planner to create tasks
         c.execute('''Create TABLE if not exists Tasks
-                    (tkey integer primary key, skey integer, date timestamp, volume int)''')
+                    (tkey integer primary key, akey integer, date timestamp, volume int)''')
         conn.commit()
         conn.close()
     def insertMonitorData(self,noise, volume, duration):
@@ -42,7 +42,7 @@ class KnowledgeBase:
         return result
     #############Analyzer###############
 
-
+   # def insertAnalyzerData(self, ):
     ############Planner#################
     ### Write to Tasks (VOLUME)
     ###
@@ -59,7 +59,7 @@ class KnowledgeBase:
     def __init__(self):
        self.database = 'knowledge.db'
        self.createTables()
-       
+
 #Knowledge = KnowledgeBase()
 #Knowledge.createTables()
 #Knowledge.insertMonitorData(5,3,5)
