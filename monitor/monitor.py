@@ -1,3 +1,5 @@
+import sys
+sys.path.insert(0, '../')
 from KnowledgeBase import *
 
 volume = 0
