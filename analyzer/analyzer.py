@@ -1,5 +1,7 @@
 __author__ = 'Muhammad Zubair'
-from KnowledgeBase import KnowledgeBase
+import sys
+sys.path.insert(0, '../')
+from KnowledgeBase import *
 
 ##Analyzer needs to do the following tasks
 ## 1. Read latest item from the monitor tables
