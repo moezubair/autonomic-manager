@@ -58,9 +58,10 @@ class KnowledgeBase:
         return c.fetchall()
     def __init__(self):
        self.database = 'knowledge.db'
-
-Knowledge = KnowledgeBase()
-Knowledge.createTables()
-Knowledge.insertMonitorData(5,3,5)
+       self.createTables()
+       
+#Knowledge = KnowledgeBase()
+#Knowledge.createTables()
+#Knowledge.insertMonitorData(5,3,5)
 #NOISE, VOLUME, DURATION
-print Knowledge.readMonitorData()
+#print Knowledge.readMonitorData()
