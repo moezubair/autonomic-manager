@@ -26,18 +26,13 @@ class KnowledgeBase:
         c.execute('Insert INTO MonitorDataLog VALUES (NULL,?,?,?,?)',(datetime.datetime.now(),noise,volume,duration))
         conn.commit()
         conn.close()
-    def readData(self,quantity="one",condition="",order="",table):
+    def readMonitorData(self,quantity="one"):
         #Read monitor data log, this is used by the analyzer to read the latest monitor data value
         global database
         result = ""
         conn = sqlite3.connect(self.database)
         c=conn.cursor()
-        query = "SELECT * FROM "+table
-        query += ("" if condition=="" else " WHERE "+condition)
-        query += ("" if order=="" else " ORDER BY "+order)
-        print query
-        #c.execute("SELECT * FROM MonitorDataLog ORDER BY date desc")
-        c.execute(query)
+        c.execute("SELECT * FROM MonitorDataLog ORDER BY date desc")
         if (quantity=="one"):
             result= c.fetchone()
         else:
@@ -67,4 +62,4 @@ class KnowledgeBase:
 Knowledge = KnowledgeBase()
 Knowledge.createTables()
 Knowledge.insertMonitorData(5,3,5)
-print Knowledge.readData("one",,"date desc")
+print Knowledge.readMonitorData()
