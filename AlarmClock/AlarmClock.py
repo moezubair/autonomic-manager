@@ -1,5 +1,7 @@
 from Tkinter import *
 from sound import *
+from noise import *
+from state import *
 import time
 
 class AlarmClock(Frame):
@@ -32,6 +34,7 @@ class AlarmClock(Frame):
 
         self.sensor_data = Scale(length=140, label='Noise', from_=100, to=0)
         self.sensor_data.pack({"side":"left"})
+        self.sensor_data.set(self.noise_generator.value)
 
         self.alarm_sound = Sound('boom.wav')
 
@@ -58,25 +61,55 @@ class AlarmClock(Frame):
             self.alarm_sound.playSound()
             self.alarm_playing = True
 
-        if self.volume < 100:
-            self.volume += 1.0
-            self.volume_slider.set(self.volume)
-            self.alarm_sound.soundVolume(self.volume/100)
+        if self.alarm_playing:
+            duration += 200
+
+        if self.state.volume != self.volume or self.state.duration != self.duration:
+            self.state.update(self.volume, self.noise, self.duration)
+        
 
         # calls itself every 200 milliseconds
         # to update the time display as needed
         self.clock.after(200, self.tick)
 
+    def updateNoise(self):
+        self.noise_generator.senseNoise()
+        self.noise = self.noise_generator.value
+        self.sensor_data.set(self.noise)
+        self.sensor_data.after(10000, self.updateNoise)
+        self.state.update(self.volume, self.noise, self.duration)
+
+    def increaseVolume(self, n):
+        if self.volume < 100:
+            self.volume += n
+            self.volume_slider.set(self.volume)
+            self.alarm_sound.soundVolume(self.volume/100)
+            self.state.update(self.volume, self.noise, self.duration)
+
+
+    def decreaseVolume(self, n):
+        if self.volume > 0:
+            self.volume -= n
+            self.volume_slider.set(self.volume)
+            self.alarm_sound.soundVolume(self.volume/100)
+            self.state.update(self.volume, self.noise, self.duration)
 
     def __init__(self, master=None):
         Frame.__init__(self, master)
         self.pack({"side": "bottom"})
         self.volume = 50.0
+        self.noise_generator = Noise()
+        self.noise = self.noise_generator.senseNoise()
+        self.duration = 0
+
+        self.state = State(self.volume, self.noise, self.duration)
+
         self.time1 = ''
         self.alarm_set = False
         self.alarm_playing = False
         self.createWidgets()
         self.tick()
+        self.updateNoise()
         
 
 root = Tk()
