@@ -1,7 +1,7 @@
 class State(object):
 	
 	def update(self, volume, noise, duration):
-		f = open('data', 'rw')
+		f = open('data', 'w')
 		self.volume = volume
 		self.noise = noise
 		self.duration = duration
