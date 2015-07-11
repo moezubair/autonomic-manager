@@ -85,7 +85,7 @@ class KnowledgeBase:
         query = "SELECT * FROM Tasks"
         if (analyzerkey !=-1):
             query += " WHERE akey="+str(analyzerkey)
-        query += " ORDER BY tkey ASC"
+        query += " ORDER BY tkey DESC"
        # print query
         c.execute(query)
         if (quantity=="one"):
@@ -107,6 +107,14 @@ class KnowledgeBase:
         c.execute('Insert INTO Tasks VALUES (NULL,?,?,?,0)',(analyzerkey,datetime.datetime.now(),volume))
         conn.commit()
         conn.close()
+    def taskCompleted(self,tkey):
+        global database
+        conn = sqlite3.connect(self.database)
+        c=conn.cursor()
+        query = "UPDATE Tasks SET completed=1 WHERE tkey="+str(tkey)
+        c.execute(query)
+        conn.commit()
+        conn.close()
     def createPolicy(self):
         global database
 
@@ -117,7 +125,7 @@ class KnowledgeBase:
        # print counter
         if (counter[0] == 0 ):
             c.execute('INSERT INTO Policy VALUES (NULL,?,?,?)',("Volume","Increase",10))
-            c.execute('INSERT INTO Policy VALUES (NULL,?,?,?)',("Volume","Decrease",10))
+            c.execute('INSERT INTO Policy VALUES (NULL,?,?,?)',("Volume","Decrease",1))
             c.execute('INSERT INTO Policy VALUES (NULL,?,?,?)',("Duration","None",10000))
 
         conn.commit()

@@ -3,7 +3,8 @@ from sound import *
 from noise import *
 from state import *
 import time
-
+import os
+import os.path
 class AlarmClock(Frame):
 
     def createWidgets(self):
@@ -38,7 +39,7 @@ class AlarmClock(Frame):
 
         self.alarm_sound = Sound('boom.wav')
 
-        
+
     def setAlarm(self):
         self.alarm_set = True
         print (self.alarm.get())
@@ -52,7 +53,10 @@ class AlarmClock(Frame):
     def tick(self):
         self.volume = self.volume_slider.get()
         self.time2 = time.strftime('%H:%M:%S')
-
+        if (os.path.isfile('volume')):
+            with open('volume', 'r') as f :
+                self.setVolume(int (f.readline()))
+            os.remove('volume')
         if self.time2 != self.time1:
             self.time1 = self.time2
             self.clock.config(text=self.time2)
@@ -76,7 +80,7 @@ class AlarmClock(Frame):
         self.noise_generator.senseNoise()
         self.noise = self.noise_generator.value
         self.sensor_data.set(self.noise)
-        self.sensor_data.after(10000, self.updateNoise)
+        self.sensor_data.after(20000, self.updateNoise)
         self.state.update(self.volume, self.noise, self.duration)
 
     def increaseVolume(self, n):
@@ -85,6 +89,12 @@ class AlarmClock(Frame):
             self.volume_slider.set(self.volume)
             self.alarm_sound.soundVolume(self.volume/100)
             self.state.update(self.volume, self.noise, self.duration)
+    def setVolume(self, n):
+
+        self.volume = n
+        self.volume_slider.set(self.volume)
+        self.alarm_sound.soundVolume(self.volume/100)
+        self.state.update(self.volume, self.noise, self.duration)
 
 
     def decreaseVolume(self, n):

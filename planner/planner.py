@@ -20,8 +20,8 @@ def checkifExists(rowno):
     plannerdata = KB.readTasks(rowno)
   #  print analyzerdata
     #print plannerdata
-    print rowno
-    print "already in the table"
+    print plannerdata,
+    print " already in the table"
     if (type(plannerdata) is not NoneType):
         print plannerdata
         return True #true
@@ -33,7 +33,7 @@ def readData():
         return
     akey = data[0]
     if (checkifExists(akey) is False):
-        print "hello"
+        print "Added new Planning data"
         property = data[3]
         action = data[4]
         volume = data[5]
@@ -42,18 +42,21 @@ def readData():
         if (property=="Volume"):
             #Read Policy
             multiplicity = KB.readPolicy(property,action)
-            print multiplicity
+
             factor = multiplicity[0][3]
             if (action=="Increase"):
-                newVolume += volume*(factor/100)
+                newVolume += factor
             elif (action=="Decrease"):
-                newVolume -= volume*(factor/100)
+                newVolume -= factor
             if (newVolume < 0):
                 newVolume = 0
             elif (newVolume >100):
                 newVolume = 100
 
             KB.insertTaskData(akey,newVolume)
+            print "New Task added to be read by the Executor To : " + action + " "+property+" by ",
+            print factor
+
 
 while 1:
     readData()

@@ -30,9 +30,10 @@ def readData():
         duration = data[4]
         action =""
         property = ""
+        oldvolume=noise
         print data
         if (checkifExists(rowid) == False):
-            print "Added data"
+            print "Analyzing Monitor data and adding to Analyzer"
         #Read policy
             duration = KB.readPolicy("Duration")
             #print duration
@@ -40,11 +41,23 @@ def readData():
             if (noise > volume):
                 #increase volume
                 action ="Increase"
+                property="Volume"
+            elif (noise < (volume+5)):
+                action="Decrease"
                 property ="Volume"
+                oldvolume=volume
             elif (duration > duration_limit):
                 action = "Increase"
                 property = "Volume"
-            KB.insertAnalyzerData(rowid,property,action,volume)
+                oldvolume=volume
+            KB.insertAnalyzerData(rowid,property,action,oldvolume)
+            print "New Analyzer Data added with following properties:"
+            print "row id:",
+            print rowid
+            print "property:",
+            print property
+            print "action:",
+            print action
 
 while 1:
     readData()

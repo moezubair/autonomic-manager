@@ -27,7 +27,7 @@ while 1:
 
 	except Exception, e:
 		raise e
-	time.sleep(2)
+	time.sleep(5)
 	
 	
 	
