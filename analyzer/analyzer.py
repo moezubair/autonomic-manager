@@ -21,11 +21,16 @@ duration = data[4]
 action =""
 property = ""
 #Read policy
-duration-poicy = KB.readPolicy("Duration")
+duration = KB.readPolicy("Duration")
+#print duration
+duration_limit = duration[0][3]
 if (noise > volume):
     #increase volume
     action ="Increase"
     property ="Volume"
-if (duration > )
+elif (duration > duration_limit):
+    action = "Increase"
+    property = "Volume"
+KB.insertAnalyzerData(rowid,property,action)
 
-print data
+#print data
