@@ -7,14 +7,14 @@ class KnowledgeBase:
         c=conn.cursor()
         #Create table for Monitor to store data to
         c.execute('''Create TABLE if not exists MonitorDataLog
-                    (mkey integer primary key,date timestamp, NoiseLevel int,VolumeLevel, Duration real)''')
+                    (mkey integer primary key,date timestamp, NoiseLevel int,VolumeLevel int, Duration real)''')
         #Create table for Analyzer to store data to
         c.execute('''Create TABLE if not exists AnalyzerDataLog
-                    (akey integer primary key, mkey integer, date timestamp, property string, action string)''')
+                    (akey integer primary key, mkey integer, date timestamp, property string, action string, oldVolume int)''')
 
         #Create table for Planner to create tasks
         c.execute('''Create TABLE if not exists Tasks
-                    (tkey integer primary key, akey integer, date timestamp, volume int)''')
+                    (tkey integer primary key, akey integer, date timestamp, volume int, completed int)''')
         #Create table for policy
         c.execute('''Create TABLE if not exists Policy
                     (policykey integer primary key, property string, action string, value int)''')
@@ -44,8 +44,26 @@ class KnowledgeBase:
         conn.close()
         return result
     #############Analyzer###############
-
-    def insertAnalyzerData(self,monitorkey,property,action ):
+    def readAnalyzerData(self,monitorkey=-1,quantity="one"):
+        #Read monitor data log, this is used by the analyzer to read the latest monitor data value
+        global database
+        result = ""
+        conn = sqlite3.connect(self.database)
+        c=conn.cursor()
+        query = "SELECT * FROM AnalyzerDataLog"
+        if (monitorkey !=-1):
+            query += " WHERE mkey="+str(monitorkey)
+        query += " ORDER BY akey desc"
+       # print query
+        c.execute(query)
+        if (quantity=="one"):
+            result= c.fetchone()
+        else:
+            result= c.fetchall()
+        conn.commit()
+        conn.close()
+        return result
+    def insertAnalyzerData(self,monitorkey,property,action, volume ):
     ############Planner#################
     ### Write to Tasks (VOLUME)
     ###
@@ -54,18 +72,41 @@ class KnowledgeBase:
         conn = sqlite3.connect(self.database)
         #Insert data into monitordatalog
         c = conn.cursor()
-        c.execute('Insert INTO AnalyzerDataLog VALUES (NULL,?,?,?,?)',(datetime.datetime.now(),monitorkey,property,action))
+        c.execute('Insert INTO AnalyzerDataLog VALUES (NULL,?,?,?,?,?)',(monitorkey,datetime.datetime.now(),property,action,volume))
         conn.commit()
         conn.close()
     #########EXECUTOR##################
     ### READ From Tasks
     ###
-    def readTasks(self):
+    def readTasks(self, analyzerkey=-1, quantity="one"):
         global database
         conn = sqlite3.connect(self.database)
         c=conn.cursor()
-        c.execute("SELECT * FROM Tasks WHERE executed=0 ORDER BY date desc")
-        return c.fetchall()
+        query = "SELECT * FROM Tasks"
+        if (analyzerkey !=-1):
+            query += " WHERE akey="+str(analyzerkey)
+        query += " ORDER BY tkey ASC"
+       # print query
+        c.execute(query)
+        if (quantity=="one"):
+            result= c.fetchone()
+        else:
+            result= c.fetchall()
+        conn.commit()
+        conn.close()
+        return result
+    def insertTaskData(self,analyzerkey, volume ):
+    ############Planner#################
+    ### Write to Tasks (VOLUME)
+    ###
+   #Insert to the analyzer data log table. This is used by the anaylzer component
+        global database
+        conn = sqlite3.connect(self.database)
+        #Insert data into monitordatalog
+        c = conn.cursor()
+        c.execute('Insert INTO Tasks VALUES (NULL,?,?,?,0)',(analyzerkey,datetime.datetime.now(),volume))
+        conn.commit()
+        conn.close()
     def createPolicy(self):
         global database
 
@@ -81,7 +122,7 @@ class KnowledgeBase:
 
         conn.commit()
         conn.close()
-    def readPolicy(self,Policy="all"):
+    def readPolicy(self,Policy="all",Volume=""):
         #Read monitor data log, this is used by the analyzer to read the latest monitor data value
         global database
         result = ""
@@ -92,6 +133,8 @@ class KnowledgeBase:
             result= c.fetchall()
         else:
             query = "Select * FROM Policy WHERE property = '"+Policy+"'"
+            if (Policy =="Volume"):
+                query += " AND action='"+Volume+"'"
             c.execute(query)
             result=c.fetchall()
         conn.commit()

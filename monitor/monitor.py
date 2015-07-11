@@ -1,6 +1,7 @@
 import sys
 sys.path.insert(0, '../')
 from KnowledgeBase import *
+import time
 
 volume = 0
 noise = 0
@@ -26,7 +27,7 @@ while 1:
 
 	except Exception, e:
 		raise e
-	
+	time.sleep(2)
 	
 	
 	
