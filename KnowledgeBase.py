@@ -45,11 +45,18 @@ class KnowledgeBase:
         return result
     #############Analyzer###############
 
-   # def insertAnalyzerData(self, ):
+    def insertAnalyzerData(self,monitorkey,property,action ):
     ############Planner#################
     ### Write to Tasks (VOLUME)
     ###
-
+   #Insert to the analyzer data log table. This is used by the anaylzer component
+        global database
+        conn = sqlite3.connect(self.database)
+        #Insert data into monitordatalog
+        c = conn.cursor()
+        c.execute('Insert INTO AnalyzerDataLog VALUES (NULL,?,?,?,?)',(datetime.datetime.now(),monitorkey,property,action))
+        conn.commit()
+        conn.close()
     #########EXECUTOR##################
     ### READ From Tasks
     ###
@@ -64,29 +71,37 @@ class KnowledgeBase:
 
         conn = sqlite3.connect(self.database)
         c=conn.cursor()
-        c.execute('INSERT INTO Policy VALUES (NULL,?,?,?)',("Volume","Increase",10))
-        c.execute('INSERT INTO Policy VALUES (NULL,?,?,?)',("Volume","Decrease",10))
-        c.execute('INSERT INTO Policy VALUES (NULL,?,?,?)',("Duration","None",10000))
+        c.execute ("SELECT COUNT(*) FROM Policy")
+        counter = c.fetchone()
+       # print counter
+        if (counter[0] == 0 ):
+            c.execute('INSERT INTO Policy VALUES (NULL,?,?,?)',("Volume","Increase",10))
+            c.execute('INSERT INTO Policy VALUES (NULL,?,?,?)',("Volume","Decrease",10))
+            c.execute('INSERT INTO Policy VALUES (NULL,?,?,?)',("Duration","None",10000))
 
         conn.commit()
         conn.close()
-    def readPolicy(self,Policy="all",property="all"):
+    def readPolicy(self,Policy="all"):
         #Read monitor data log, this is used by the analyzer to read the latest monitor data value
         global database
         result = ""
         conn = sqlite3.connect(self.database)
         c=conn.cursor()
-        if (property=="all"):
+        if (Policy=="all"):
             c.execute("SELECT * FROM Policy ORDER BY policykey asc")
             result= c.fetchall()
         else:
-            c.execute('SELECT * FROM Policy WHERE property=? ',property)
+            query = "Select * FROM Policy WHERE property = '"+Policy+"'"
+            c.execute(query)
+            result=c.fetchall()
         conn.commit()
         conn.close()
         return result
     def __init__(self):
        self.database = '../knowledge.db'
        self.createTables()
+
+       self.createPolicy()
 
 #Knowledge = KnowledgeBase()
 #Knowledge.createTables()
